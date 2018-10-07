@@ -11,19 +11,22 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class Robot extends IterativeRobot {
 private Drive Drive;
-	
+private States States;
 
 	@Override
 	public void robotInit() {
 		IO.left.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
 		IO.right.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
 	Drive = new Drive(IO.left,IO.right);
+	//as a subsystem we define it in robotInit
+	States = new States(IO.leftSole, IO.rightSole, IO.left, IO.right);
 	}
 
 		@Override
@@ -39,12 +42,19 @@ private Drive Drive;
 
 	@Override
 	public void teleopInit(){
-		Drive.init();
+		//initialization of our subsystems
+		//Drive.init();
+		States.init();
 	}
 	
 	@Override
 	public void teleopPeriodic() {
-		Drive.update();
+		//turns on the compressor for pnuematics- the solenoids
+		IO.compressorRelay.set(IO.compressor.enabled() ? Relay.Value.kForward : Relay.Value.kOff);
+		//update for our subsystems
+		//Drive.update();
+		Time.update();
+		States.states();
 	}
 
 	
